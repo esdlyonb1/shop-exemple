@@ -21,7 +21,7 @@
 
                 <img src="{{ imgSrc }}" alt="">
                 <h3>Price : {{ product.price }}</h3>
-                <a href="" class="btn btn-success">Add to cart</a>
+                <a href="{{ path('app_cart_add', {id:product.id, quantity:1}) }}" class="btn btn-success">Add to cart</a>
 
                 <a href="{{ path('app_customer_show',{id:product.id}) }}" class="btn btn-primary">See</a>
 
