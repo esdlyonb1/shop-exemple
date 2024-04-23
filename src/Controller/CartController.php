@@ -38,3 +38,9 @@ public function addToCart(Request $request, Product $product, $quantity, CartSer
 
 }
 }
+
+//public function removeOneProduct( );
+//public function removeProductRow( );
+//public function emptyCart();
+
+

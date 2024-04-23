@@ -19,21 +19,7 @@ class CartService
 
     }
 
-    public function addProduct(Product $product, int $quantity)
-    {
-       $cart = $this->requestStack->getSession()->get("cart", []);
-       $productId = $product->getId();
 
-       if(isset($cart[$productId])) {
-           $cart[$productId] = $cart[$productId]+$quantity;
-       }else  {
-           $cart[$productId] = $quantity;
-
-       }
-
-       $this->requestStack->getSession()->set("cart",$cart);
-
-    }
     public function getCart()
     {
         $cart = $this->requestStack->getSession()->get("cart", []);
@@ -49,5 +35,26 @@ class CartService
 
         return $objectCart;
     }
+    public function addProduct(Product $product, int $quantity)
+    {
+        $cart = $this->requestStack->getSession()->get("cart", []);
+        $productId = $product->getId();
+
+        if(isset($cart[$productId])) {
+            $cart[$productId] = $cart[$productId]+$quantity;
+        }else  {
+            $cart[$productId] = $quantity;
+
+        }
+
+        $this->requestStack->getSession()->set("cart",$cart);
+
+    }
+
+    //public function removeOneProduct()
+    // public function removeProductRow()
+    //public function emptyCart()
+    //public function cartCount() // pourr afficher le bouton Cart(12)
+
 
 }
