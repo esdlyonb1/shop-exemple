@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h3>Product : {{ product.name }}</h3>
+    <div class="d-flex">
+        {% for image in product.images %}
+            <img src="{{ vich_uploader_asset(image) | imagine_filter('product_show')}}" alt="" class="border border-dark p-3 m-3">
+        {% endfor %}
+    </div>
+    <div class="border border-dark">
+        <p>Price : </p>
+        <p>Date added : </p>
+
+        <a href="{{ path('app_customer_index') }}" class="btn btn-secondary">return</a>
+        <a href="" class="btn btn-success">Add to cart</a>
+    </div>
+    
+{% endblock %}
+
+{% block title %}
+
+{% endblock %}
+

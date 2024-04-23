@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CustomerController!{% endblock %}
+
+{% block body %}
+
+    <div class="products mt-5">
+        {% for product in products %}
+            <div class="border border-dark col-3">
+                <h3>{{ product.name }}</h3>
+                {% if product.images[0] is defined %}
+
+                    {% set imgSrc = vich_uploader_asset(product.images[0]) |imagine_filter("product_index") %}
+
+                {% else %}
+
+                    {% set imgSrc = asset("images/productNoImage.png") %}
+
+                {% endif %}
+
+
+                <img src="{{ imgSrc }}" alt="">
+                <h3>Price : {{ product.price }}</h3>
+                <a href="" class="btn btn-success">Add to cart</a>
+
+                <a href="{{ path('app_customer_show',{id:product.id}) }}" class="btn btn-primary">See</a>
+
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
