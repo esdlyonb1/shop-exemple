@@ -51,10 +51,59 @@ class CartService
 
     }
 
-    //public function removeOneProduct()
-    // public function removeProductRow()
-    //public function emptyCart()
-    //public function cartCount() // pourr afficher le bouton Cart(12)
+    public function removeOneProduct(Product $product)
+    {
+        $cart = $this->requestStack->getSession()->get("cart", []);
+        $productId = $product->getId();
+
+        if(isset($cart[$productId])) {
+
+            $cart[$productId]--;
+            if($cart[$productId] === 0) {
+                unset($cart[$productId]);
+            }
+        }
+
+        $this->requestStack->getSession()->set("cart",$cart);
+    }
+  public function removeProductRow(Product $product)
+  {
+      $cart = $this->requestStack->getSession()->get("cart", []);
+      $productId = $product->getId();
+
+      if(isset($cart[$productId])) {
+          unset($cart[$productId]);
+      }
+      $this->requestStack->getSession()->set("cart",$cart);
+
+  }
+    public function emptyCart()
+    {
+        $this->requestStack->getSession()->remove("cart");
+    }
+
+    public function getTotal()
+    {
+          $objectCart = $this->getCart();
+          $total = 0;
+          foreach ($objectCart as $item) {
+              $total += ($item['product']->getPrice() * $item['quantity']);
+          }
+
+          return $total;
+    }
+
+    public function cartCount()
+    {
+         $cart = $this->requestStack->getSession()->get("cart", []);
+         $count = 0;
+
+             foreach ($cart as $quantity) {
+                 $count += $quantity;
+             }
+
+         return $count;
+    }
 
 
 }

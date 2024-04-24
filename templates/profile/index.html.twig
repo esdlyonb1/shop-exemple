@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ProfileController!{% endblock %}
+
+{% block body %}
+<h3>Hello {{ app.user.email }}</h3>
+
+    <hr>
+    <h3>your payment methods</h3>
+    <div class="border border-dark">
+        <h4>Add payment method</h4>
+        {{ form(formPayment) }}
+    </div>
+    {% for paymentMethod in app.user.paymentMethods %}
+        <p><strong>{{ paymentMethod.cardNumber }}</strong></p>
+
+    {% endfor %}
+    <hr>
+
+    <h3>your addresses</h3>
+    <div class="border border-dark">
+    <h4>Add Address</h4>
+    {{ form(formAddress) }}
+</div>
+
+    {% for address in app.user.addresses %}
+
+        <p><strong>{{ address.zipcode }}  {{ address.city }}</strong></p>
+
+    {% endfor %}
+
+
+{% endblock %}

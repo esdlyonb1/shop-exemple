@@ -18,11 +18,12 @@ class CartController extends AbstractController
 
         return $this->render('cart/index.html.twig', [
             'cart' => $cartService->getCart(),
+            'total' => $cartService->getTotal(),
         ]);
     }
 
     #[Route('/cart/add/{id}/{quantity}', name: 'app_cart_add')]
-    #[Route('/cart/add/{id}/{quantity}', name: 'app_cart_addfromcart')]
+    #[Route('/cart/addfromcart/{id}/{quantity}', name: 'app_cart_addfromcart')]
 public function addToCart(Request $request, Product $product, $quantity, CartService $cartService): Response
     {
             $cartService->addProduct($product, $quantity);
@@ -37,6 +38,25 @@ public function addToCart(Request $request, Product $product, $quantity, CartSer
         return $this->redirectToRoute($redirection);
 
 }
+
+#[Route('/cart/removeone/{id}', name: 'app_cart_remove_one')]
+public function removeOneFromCart(Product $product, CartService $cartService): Response
+{
+    $cartService->removeOneProduct($product);
+    return $this->redirectToRoute('app_cart');
+}
+    #[Route('/cart/removerow/{id}', name: 'app_cart_remove_row')]
+    public function removeRowFromCart(Product $product, CartService $cartService): Response
+    {
+        $cartService->removeProductRow($product);
+        return $this->redirectToRoute('app_cart');
+    }
+    #[Route('/cart/empty', name: 'app_cart_empty')]
+    public function emptyCart(CartService $cartService): Response
+    {
+        $cartService->emptyCart();
+        return $this->redirectToRoute('app_cart');
+    }
 }
 
 //public function removeOneProduct( );
