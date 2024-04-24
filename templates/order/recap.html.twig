@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello OrderController!{% endblock %}
+
+{% block body %}
+
+    <h3>Order recap :</h3>
+
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>product</th>
+                <th>price</th>
+                <th>quantity</th>
+                <th>subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+    {% for item in items %}
+
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.product.price }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.quantity }} * {{ item.product.price }}</td>
+    </tr>
+
+    {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>Billing address :</td>
+                <td>{{ order.billingAddress.streetNumber }} {{ order.billingAddress.street }} {{ order.billingAddress.zipcode }} {{ order.billingAddress.city }} </td>
+
+
+            </tr>
+            <tr>
+                <td>Delivery address :</td>
+                <td>{{ order.deliveryAddress.streetNumber }} {{ order.deliveryAddress.street }} {{ order.deliveryAddress.zipcode }} {{ order.deliveryAddress.city }} </td>
+
+            </tr>
+                <tr>
+                    <td>Payement Method</td>
+                    <td>{{ order.paymentMethod.cardNumber }}</td>
+                </tr>
+
+            <tr>
+                <td>Total : </td>
+                <td>{{ total }}</td>
+            </tr>
+            </tfoot>
+
+        </table>
+
+
+{% endblock %}

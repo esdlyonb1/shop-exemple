@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AddressRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -35,6 +37,24 @@ class Address
 
     #[ORM\Column(length: 255)]
     private ?string $country = null;
+
+    /**
+     * @var Collection<int, Order>
+     */
+    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'billingAddress')]
+    private Collection $ordersAsBilling;
+
+    /**
+     * @var Collection<int, Order>
+     */
+    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'deliveryAddress')]
+    private Collection $ordersAsDelivery;
+
+    public function __construct()
+    {
+        $this->ordersAsBilling = new ArrayCollection();
+        $this->ordersAsDelivery = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -121,6 +141,66 @@ class Address
     public function setCountry(string $country): static
     {
         $this->country = $country;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Order>
+     */
+    public function getOrdersAsBilling(): Collection
+    {
+        return $this->ordersAsBilling;
+    }
+
+    public function addOrdersAsBilling(Order $ordersAsBilling): static
+    {
+        if (!$this->ordersAsBilling->contains($ordersAsBilling)) {
+            $this->ordersAsBilling->add($ordersAsBilling);
+            $ordersAsBilling->setBillingAddress($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrdersAsBilling(Order $ordersAsBilling): static
+    {
+        if ($this->ordersAsBilling->removeElement($ordersAsBilling)) {
+            // set the owning side to null (unless already changed)
+            if ($ordersAsBilling->getBillingAddress() === $this) {
+                $ordersAsBilling->setBillingAddress(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Order>
+     */
+    public function getOrdersAsDelivery(): Collection
+    {
+        return $this->ordersAsDelivery;
+    }
+
+    public function addOrdersAsDelivery(Order $ordersAsDelivery): static
+    {
+        if (!$this->ordersAsDelivery->contains($ordersAsDelivery)) {
+            $this->ordersAsDelivery->add($ordersAsDelivery);
+            $ordersAsDelivery->setDeliveryAddress($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrdersAsDelivery(Order $ordersAsDelivery): static
+    {
+        if ($this->ordersAsDelivery->removeElement($ordersAsDelivery)) {
+            // set the owning side to null (unless already changed)
+            if ($ordersAsDelivery->getDeliveryAddress() === $this) {
+                $ordersAsDelivery->setDeliveryAddress(null);
+            }
+        }
 
         return $this;
     }
