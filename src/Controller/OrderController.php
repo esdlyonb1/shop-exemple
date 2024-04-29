@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Order;
 use App\Repository\AddressRepository;
+use App\Repository\OrderRepository;
 use App\Repository\PaymentMethodRepository;
 use App\Service\CartService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,8 +19,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class OrderController extends AbstractController
 {
 
-    #[Route('/selection', name: 'app_selection', methods: ['GET'])]
-    public function selection(): Response
+    #[Route('/selection', name: 'app_selection', methods: ['GET', 'POST'], priority: 5)]
+    public function selection(                          AddressRepository $addressRepository,
+                                                        PaymentMethodRepository $paymentMethodRepository,
+                                                        EntityManagerInterface $entityManager,
+                                                        Request $request): Response
     {
         $addresses = $this->getUser()->getAddresses();
         $paymentMethods = $this->getUser()->getPaymentMethods();
@@ -40,10 +44,10 @@ class OrderController extends AbstractController
                 'choice_label' => "cardNumber",
                 'choice_value' => "id",
             ])
-            ->add('submit', SubmitType::class, [])
             ->setMethod('POST')
-            ->setAction($this->generateUrl("app_recap"))
             ->getForm();
+
+
 
 
 
@@ -54,36 +58,39 @@ class OrderController extends AbstractController
         ]);
     }
 
-    #[Route('/recap', name: 'app_recap', methods: ['POST'])]
-    public function recap(Request $request,
-                          AddressRepository $addressRepository,
-                          PaymentMethodRepository $paymentMethodRepository,
-                          EntityManagerInterface $entityManager,
-                            CartService $cartService,
-    ): Response
+#[Route('/create', name: 'app_order_create', methods: ['GET', 'POST'])]
+public function create(Request $request,
+                       AddressRepository $addressRepository,
+                       PaymentMethodRepository $paymentMethodRepository,
+                        EntityManagerInterface $entityManager,
+
+):Response
+{
+    $infos = $request->get('form');
+    $deliveryAddress = $addressRepository->find($infos['delivery']);
+    $billingAddress = $addressRepository->find($infos['billing']);
+    $paymentMethod = $paymentMethodRepository->find($infos['payment']);
+
+    $order = new Order();
+    $order->setCustomer($this->getUser());
+    $order->setBillingAddress($billingAddress);
+    $order->setDeliveryAddress($deliveryAddress);
+    $order->setPaymentMethod($paymentMethod);
+    $order->setStatus(0);
+    $order->setDeliveryStatus(0);
+
+    $entityManager->persist($order);
+    $entityManager->flush();
+
+    return $this->redirectToRoute('app_recap_order', ['id' => $order->getId()]) ;
+
+}
+
+    #[Route('/recap/{id}', name: 'app_recap_order', methods: ['POST', 'GET'])]
+public function recapOrder($id,OrderRepository $orderRepository, CartService $cartService): Response
     {
-
-      $infos = $request->get('form');
-      $deliveryAddress = $addressRepository->find($infos['delivery']);
-      $billingAddress = $addressRepository->find($infos['billing']);
-      $paymentMethod = $paymentMethodRepository->find($infos['payment']);
-
-      $order = new Order();
-      $order->setCustomer($this->getUser());
-      $order->setBillingAddress($billingAddress);
-      $order->setDeliveryAddress($deliveryAddress);
-      $order->setPaymentMethod($paymentMethod);
-      $order->setStatus(0);
-      $order->setDeliveryStatus(0);
-
-      $entityManager->persist($order);
-      $entityManager->flush();
-
-
-
-
         return $this->render('order/recap.html.twig', [
-            'order' => $order,
+            'order' => $orderRepository->find($id),
             'total' =>$cartService->getTotal(),
             'items' =>$cartService->getCart()
         ]);

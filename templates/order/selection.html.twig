@@ -3,6 +3,11 @@
 {% block title %}Hello OrderController!{% endblock %}
 
 {% block body %}
-{{ form(form) }}
+{{ form_start(form, {attr:{action:path('app_order_create')}}) }}
+{{ form_widget(form.billing) }}
+{{ form_widget(form.delivery) }}
+{{ form_widget(form.payment) }}
+    <button type="submit" class="btn btn-success">OK</button>
+{{ form_end(form) }}
 
 {% endblock %}
