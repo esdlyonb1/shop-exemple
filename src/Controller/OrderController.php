@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Order;
+use App\Entity\OrderItem;
 use App\Repository\AddressRepository;
 use App\Repository\OrderRepository;
 use App\Repository\PaymentMethodRepository;
@@ -63,6 +64,7 @@ public function create(Request $request,
                        AddressRepository $addressRepository,
                        PaymentMethodRepository $paymentMethodRepository,
                         EntityManagerInterface $entityManager,
+                        CartService $cartService
 
 ):Response
 {
@@ -78,8 +80,20 @@ public function create(Request $request,
     $order->setPaymentMethod($paymentMethod);
     $order->setStatus(0);
     $order->setDeliveryStatus(0);
+    $order->setTotal($cartService->getTotal());
 
     $entityManager->persist($order);
+
+
+    foreach ($cartService->getCart() as $cartItem)
+    {
+        $orderItem = new OrderItem();
+        $orderItem->setProduct($cartItem["product"]);
+        $orderItem->setQuantity($cartItem["quantity"]);
+        $orderItem->setOfOrder($order);
+        $entityManager->persist($orderItem);
+
+    }
     $entityManager->flush();
 
     return $this->redirectToRoute('app_recap_order', ['id' => $order->getId()]) ;
@@ -87,12 +101,27 @@ public function create(Request $request,
 }
 
     #[Route('/recap/{id}', name: 'app_recap_order', methods: ['POST', 'GET'])]
-public function recapOrder($id,OrderRepository $orderRepository, CartService $cartService): Response
+public function recapOrder($id,OrderRepository $orderRepository): Response
     {
         return $this->render('order/recap.html.twig', [
             'order' => $orderRepository->find($id),
-            'total' =>$cartService->getTotal(),
-            'items' =>$cartService->getCart()
+
         ]);
+    }
+    #[Route('/pay/{id}', name: 'app_pay', methods: ['GET'])]
+public function payOrder(Order $order, EntityManagerInterface $entityManager, CartService $cartService): Response
+    {
+        if($order->getCustomer() ==! $this->getUser()){
+            return $this->redirectToRoute("app_home");
+        }
+        //si stripe, interroger le service stripe poru payer et retourn "success" ou "failure" au sujet du paiement
+
+        $order->setStatus(1);
+        $cartService->emptyCart();
+
+        $entityManager->persist($order);
+        $entityManager->flush();
+
+        return $this->render('order/payed.html.twig', ['order'=>$order]);
     }
 }

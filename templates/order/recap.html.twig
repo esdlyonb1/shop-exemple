@@ -17,13 +17,13 @@
             </tr>
             </thead>
             <tbody>
-    {% for item in items %}
+    {% for item in order.orderItems %}
 
     <tr>
         <td>{{ item.product.name }}</td>
         <td>{{ item.product.price }}</td>
         <td>{{ item.quantity }}</td>
-        <td>{{ item.quantity }} * {{ item.product.price }}</td>
+        <td>{{ item.quantity  *  item.product.price }}</td>
     </tr>
 
     {% endfor %}
@@ -47,7 +47,10 @@
 
             <tr>
                 <td>Total : </td>
-                <td>{{ total }}</td>
+                <td>{{ order.total }}</td>
+            </tr>
+            <tr>
+                <a href="{{ path('app_pay', {id:order.id}) }}" class="btn btn-success">Pay</a>
             </tr>
             </tfoot>
 

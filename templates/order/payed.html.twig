@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block body %}
+
+    {% if order.status == 1 %}
+
+<h3>payment successful</h3>
+
+    {% else %}
+    <h3>payment failed</h3>
+
+    {% endif %}
+
+{% endblock %}
+
